@@ -7,11 +7,6 @@ Calculator::Calculator(QWidget *parent)
 {
     ui->setupUi(this);
 
-    tabsWidget->addTab(new QWidget, "Calculator");
-    tabsWidget->addTab(new QWidget, "Convertor");
-    tabsWidget->addTab(new QWidget, "History");
-    setCentralWidget(tabsWidget);
-
 }
 
 Calculator::~Calculator()

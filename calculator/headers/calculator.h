@@ -2,7 +2,6 @@
 #define CALCULATOR_H
 
 #include <QMainWindow>
-#include <QTabWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,7 +19,5 @@ public:
 
 private:
     Ui::Calculator *ui;
-
-    QTabWidget *tabsWidget = new QTabWidget(this);
 };
 #endif // CALCULATOR_H
