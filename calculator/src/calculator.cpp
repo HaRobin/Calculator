@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-#include <functional>
+#include <QLabel>
 
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent)
@@ -15,7 +15,7 @@ Calculator::Calculator(QWidget *parent)
     std::string oldCalculation;
     bool calculating;
 
-    std::map <std::string, std::string> digitsAndOperations = {
+    digitsAndOperations = {
         {"lg", "log10("},
         {"ln", "log"},
         {"%", "/100"},
@@ -27,19 +27,13 @@ Calculator::Calculator(QWidget *parent)
         {"e", "exp(1)"}
     };
 
-    // std::map <std::string, void (Calculator::*)()> actions;
-    // = {
-    //     {"=", &Calculator::calculate}
-    // };
-    // actions["="] = &Calculator::calculate;
-
-    std::map<std::string, std::function<void()>> actions;
-    actions["="] = std::bind(&Calculator::calculate, this);
-
-    // After populating the map in the constructor
-    qDebug() << "Map populated in constructor. Size:" << actions.size();
-
-
+    actions = {
+        {"=", &Calculator::calculate},
+        {"<[]>", &Calculator::changeCalculatorMode},
+        {">[]<", &Calculator::changeCalculatorMode},
+        {"AC", &Calculator::allClear},
+        {"<-", &Calculator::backspace}
+    };
 
 
     QList<QPushButton *> allButtons = this->findChildren<QPushButton *>();
@@ -56,42 +50,32 @@ Calculator::~Calculator()
 
 void Calculator::handleButton() {
 
-
-    // At the beginning of the method where the map appears empty
-    qDebug() << "Accessing map in method. Size:" << actions.size();
-
-
     QPushButton *button = qobject_cast<QPushButton *>(sender());
+
     if (button) {
         qDebug() << "Button clicked:" << button->text();
-        if (contains(digitsAndOperations, button->text().toStdString())) {
-            qDebug() << "Button clicked:" << button->text();
+
+        if (contains(actions, button->text().toStdString())) {
+            (this->*actions.find(button->text().toStdString())->second)();
+        } else {
+            writeToCalculation(
+                contains(digitsAndOperations, button->text().toStdString()) ?
+                    digitsAndOperations.find(button->text().toStdString())->second :
+                    button->text().toStdString()
+                );
         }
-        else if (contains(actions, button->text().toStdString())) {
-
-            // qDebug() << "Button clicked:" << button->text();
-
-
-            // (this->*actions.find(button->text())->second)();
-            // actions.find()
-
-        }
-    }
-
-    for (const auto& pair : actions) {
-        qDebug() << "Key:" << QString::fromStdString(pair.first);
-    }
-
-    auto it = actions.find("=");
-
-    if (it != actions.end()) {
-        qDebug() << "found";
-    }
-    else {
-        qDebug() << "not found";
     }
 }
 
+void Calculator::writeToCalculation(const std::string str) {
+    if (!calculating) {
+        oldCalculation = currentCalculation;
+        allClear();
+        calculating = true;
+    }
+    currentCalculation.append(str);
+    syncTextLabels();
+}
 
 void Calculator::changeCalculatorMode() {
     int currentIndex = ui->stackedWidget->currentIndex();
@@ -99,35 +83,40 @@ void Calculator::changeCalculatorMode() {
     ui->stackedWidget->setCurrentIndex(nextPage);
 }
 
-bool contains(const std::string& str, char ch) {
-    return str.find(ch) != std::string::npos;
-}
-
-
-void Calculator::on_changeLayout2_clicked()
-{
-    changeCalculatorMode();
-}
-
-
-void Calculator::on_changeLayoutButton1_clicked()
-{
-    changeCalculatorMode();
-}
-
 void Calculator::backspace() {
-    currentCalculation.pop_back();
+    if (currentCalculation.length() != 0){
+        currentCalculation.pop_back();
+        syncTextLabels();
+    }
 }
 
 void Calculator::allClear() {
-    currentCalculation.clear();
+    if (currentCalculation.length() != 0)
+        currentCalculation.clear();
+    else
+        oldCalculation.clear();
+    syncTextLabels();
+}
+
+void Calculator::syncTextLabels() {
+    ui->currentCalculation->setText(QString::fromStdString(currentCalculation));
+    ui->oldCalculation->setText(QString::fromStdString(oldCalculation));
 }
 
 void Calculator::calculate() {
 
-    qDebug() << "equal button pressed";
-
     // TODO use muparser to parse string
+
+    calculating = false;
+
+    oldCalculation = currentCalculation;
+    currentCalculation = "evaluated";
+
+
+
+    syncTextLabels();
+
+    addToHistory();
 }
 
 template<typename T>
@@ -138,25 +127,29 @@ bool Calculator::contains(const std::map<std::string, T>& map, const std::string
     return map.find(str) != map.end();
 }
 
-// struct CalculationInfo {
+void Calculator::addToHistory() {
 
+    QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(ui->historyScrollAreaWidgetContents->layout());
+    if (!layout) {
+        layout = new QVBoxLayout(ui->historyScrollAreaWidgetContents);
+        ui->historyScrollAreaWidgetContents->setLayout(layout);
+    }
 
-//     // Default constructor
-//     CalculationInfo() : calculating(false),oldCalculation(""), calculating("") {}
+    // First QLabel -> calculation
+    QLabel* label1 = new QLabel(QString::fromStdString(oldCalculation + " ="));
+    label1->setAlignment(Qt::AlignRight); // Align text to the right
+    QFont font1 = label1->font();
+    font1.setPixelSize(15); // Set font size to 15 pixels
+    label1->setFont(font1);
+    label1->setFixedHeight(20);
+    layout->insertWidget(0, label1);
 
-//     // Constructor with parameters
-//     CalculationInfo(const std::string& current, const std::string& old, bool calc)
-//         : currentCalculation(current), oldCalculation(old), calculating(calc) {}
-
-//     void backSpace() {
-//         currentCalculation.pop_back();
-//     }
-
-//     void allClear() {
-//         currentCalculation.clear();
-//     }
-
-//     void calculate() {
-//         // TODO use muparser to parse string
-//     }
-// };
+    // Second QLabel -> result
+    QLabel* label2 = new QLabel(QString::fromStdString(currentCalculation));
+    label2->setAlignment(Qt::AlignRight);
+    QFont font2 = label2->font();
+    font2.setPixelSize(30);
+    label2->setFont(font2);
+    label2->setFixedHeight(40);
+    layout->insertWidget(1, label2);
+}
