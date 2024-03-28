@@ -5,6 +5,7 @@
 #include <map>
 #include <QLabel>
 // #include "headers/muparser-2.3.4/include/muParser.h"
+#include "muParser.h"
 
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent)
