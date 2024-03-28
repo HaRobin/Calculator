@@ -13,7 +13,9 @@ SOURCES += \
     src/calculator.cpp
 
 HEADERS += \
-    headers/calculator.h
+    headers/calculator.h \
+    headers/muparser-2.3.4/include/muParser.h \
+    headers/muparser-2.3.4/include/muParserBase.h
 
 FORMS += \
     ui/calculator.ui
@@ -25,3 +27,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     resources/resources.qrc
+
+# unix:!macx: LIBS += -L$$PWD/../muparser-2.3.4/ -lmuparser
+
+# INCLUDEPATH += $$PWD/../muparser-2.3.4
+# DEPENDPATH += $$PWD/../muparser-2.3.4
+
+# win32:CONFIG(release, debug|release): LIBS += -L$$PWD/headers/muparser-2.3.4/release/ -lmuparser
+# else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/headers/muparser-2.3.4/debug/ -lmuparser
+# unix:!macx: LIBS += -L$$PWD/headers/muparser-2.3.4/ -lmuparser
+
+# INCLUDEPATH += $$PWD/headers/muparser-2.3.4
+# DEPENDPATH += $$PWD/headers/muparser-2.3.4

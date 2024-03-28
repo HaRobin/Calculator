@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <QLabel>
+// #include "headers/muparser-2.3.4/include/muParser.h"
 
 Calculator::Calculator(QWidget *parent)
     : QMainWindow(parent)
@@ -32,15 +33,29 @@ Calculator::Calculator(QWidget *parent)
         {"<[]>", &Calculator::changeCalculatorMode},
         {">[]<", &Calculator::changeCalculatorMode},
         {"AC", &Calculator::allClear},
-        {"<-", &Calculator::backspace}
+        {"<-", &Calculator::backspace},
+        {"</>", &Calculator::convert}
     };
 
+    converter = {
+        {"Centimeter to Inche", &Calculator::cmToInches},
+        {"Decimal to Binary", &Calculator::decimalToBinary},
+        {"Decimal to Hexadecimal", &Calculator::decimalToHexadecimal}
+    };
 
     QList<QPushButton *> allButtons = this->findChildren<QPushButton *>();
 
     foreach(QPushButton *button, allButtons) {
         connect(button, &QPushButton::clicked, this, &Calculator::handleButton);
     }
+
+
+    std::string converterInput;
+    std::string converterOutput;
+    foreach(auto const& item,  converter) {
+        ui->comboBox->addItem(QString::fromStdString(item.first));
+    }
+
 }
 
 Calculator::~Calculator()
@@ -53,8 +68,6 @@ void Calculator::handleButton() {
     QPushButton *button = qobject_cast<QPushButton *>(sender());
 
     if (button) {
-        qDebug() << "Button clicked:" << button->text();
-
         if (contains(actions, button->text().toStdString())) {
             (this->*actions.find(button->text().toStdString())->second)();
         } else {
@@ -70,10 +83,14 @@ void Calculator::handleButton() {
 void Calculator::writeToCalculation(const std::string str) {
     if (!calculating) {
         oldCalculation = currentCalculation;
+        converterOutput.clear();
         allClear();
         calculating = true;
     }
-    currentCalculation.append(str);
+    if (ui->tabWidget->currentIndex() == 0)
+        currentCalculation.append(str);
+    else if (ui->tabWidget->currentIndex() == 1)
+        converterInput.append(str);
     syncTextLabels();
 }
 
@@ -84,32 +101,52 @@ void Calculator::changeCalculatorMode() {
 }
 
 void Calculator::backspace() {
-    if (currentCalculation.length() != 0){
-        currentCalculation.pop_back();
-        syncTextLabels();
+    if (!calculating) {
+        oldCalculation = currentCalculation;
+        converterOutput.clear();
+        allClear();
+        calculating = true;
     }
+
+    if (ui->tabWidget->currentIndex() == 0 && currentCalculation.length() != 0)
+        currentCalculation.pop_back();
+    else if (ui->tabWidget->currentIndex() == 1 && converterInput.length() != 0)
+        converterInput.pop_back();
+    syncTextLabels();
+
 }
 
 void Calculator::allClear() {
-    if (currentCalculation.length() != 0)
+    if (ui->tabWidget->currentIndex() == 0){
         currentCalculation.clear();
-    else
         oldCalculation.clear();
+    } else if (ui->tabWidget->currentIndex() == 1) {
+        converterInput.clear();
+        converterOutput.clear();
+    }
     syncTextLabels();
 }
 
 void Calculator::syncTextLabels() {
     ui->currentCalculation->setText(QString::fromStdString(currentCalculation));
+    ui->inputConverter->setText(QString::fromStdString(converterInput));
     ui->oldCalculation->setText(QString::fromStdString(oldCalculation));
+    ui->outputConverter->setText(QString::fromStdString(converterOutput));
 }
 
 void Calculator::calculate() {
 
     // TODO use muparser to parse string
 
+    // mu::Parser parser;
+    // parser.SetExpr(currentCalculation);
+    // parser.SetExpr(L"6*5");
+
     calculating = false;
 
+
     oldCalculation = currentCalculation;
+    // currentCalculation = parser.Eval();
     currentCalculation = "evaluated";
 
 
@@ -128,6 +165,8 @@ bool Calculator::contains(const std::map<std::string, T>& map, const std::string
 }
 
 void Calculator::addToHistory() {
+
+    // Adapt for converter
 
     QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(ui->historyScrollAreaWidgetContents->layout());
     if (!layout) {
@@ -152,4 +191,64 @@ void Calculator::addToHistory() {
     label2->setFont(font2);
     label2->setFixedHeight(40);
     layout->insertWidget(1, label2);
+}
+
+void Calculator::convert() {
+    calculating = false;
+
+    converterOutput = (this->*converter.find(ui->comboBox->currentText().toStdString())->second)();;
+
+    syncTextLabels();
+
+    addToHistory();
+}
+
+std::string Calculator::decimalToHexadecimal() {
+    int decimal;
+    try {
+        decimal = std::stoi(converterInput);
+    } catch (const std::exception &e) {
+        qDebug() << e.what();
+        return "error";
+    }
+
+    std::string hexadecimal = "";
+    char hexChars[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    while (decimal > 0) {
+        hexadecimal = hexChars[decimal % 16] + hexadecimal;
+        decimal /= 16;
+    }
+
+    return hexadecimal.empty() ? "0" : hexadecimal;
+}
+
+std::string Calculator::decimalToBinary() {
+    int decimal;
+    try {
+        decimal = std::stoi(converterInput);
+    } catch (const std::exception &e) {
+        return "error";
+    }
+    std::string binary = "";
+    while (decimal > 0) {
+        binary = std::to_string(decimal % 2) + binary;
+        decimal /= 2;
+    }
+    return binary.empty() ? "0" : binary;
+}
+
+std::string Calculator::cmToInches() {
+    double cm;
+    try {
+        cm = std::stod(converterInput);
+    } catch (const std::exception &e) {
+        return "error";
+    }
+    return std::to_string(cm / 2.54);
+}
+
+void Calculator::on_comboBox_currentIndexChanged(int index)
+{
+    converterOutput.clear();
 }

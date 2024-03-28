@@ -22,8 +22,11 @@ private:
 
     std::map <std::string, std::string> digitsAndOperations;
     std::map<std::string, void (Calculator::*)()> actions;
+    std::map <std::string, std::string (Calculator::*)()> converter;
     std::string currentCalculation;
     std::string oldCalculation;
+    std::string converterInput;
+    std::string converterOutput;
     bool calculating;
 
     void handleButton();
@@ -33,11 +36,16 @@ private:
     void backspace();
     void syncTextLabels();
     void addToHistory();
+    void convert();
+    std::string decimalToHexadecimal();
+    std::string decimalToBinary();
+    std::string cmToInches();
 
     template<typename T>
     bool contains(const std::map<std::string, T>& map, const std::string& str);
 
 private slots:
     void changeCalculatorMode();
+    void on_comboBox_currentIndexChanged(int index);
 };
 #endif // CALCULATOR_H
