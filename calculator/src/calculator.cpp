@@ -165,21 +165,20 @@ void Calculator::calculate() {
 
 template<typename T>
 bool Calculator::contains(const std::map<std::string, T>& map, const std::string& str) {
-    // Use the find method of the map to search for the key. If the key is found,
-    // find will return an iterator to the corresponding element, otherwise it
-    // will return an iterator to the end of the map.
     return map.find(str) != map.end();
 }
 
 void Calculator::addToHistory() {
 
-    // Adapt for converter
+    QWidget *scrollAreaWidgetContents = ui->historyScrollAreaWidgetContents;
 
-    QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(ui->historyScrollAreaWidgetContents->layout());
-    if (!layout) {
-        layout = new QVBoxLayout(ui->historyScrollAreaWidgetContents);
-        ui->historyScrollAreaWidgetContents->setLayout(layout);
+
+    QVBoxLayout *scrollAreaLayout = dynamic_cast<QVBoxLayout*>(scrollAreaWidgetContents->layout());
+    if (!scrollAreaLayout) {
+        scrollAreaLayout = new QVBoxLayout(scrollAreaWidgetContents);
+        scrollAreaWidgetContents->setLayout(scrollAreaLayout);
     }
+
     std::string firstStr;
     std::string secondStr;
     if (ui->tabWidget->currentIndex() == 0) {
@@ -193,12 +192,12 @@ void Calculator::addToHistory() {
 
     // First QLabel
     QLabel* label1 = new QLabel(QString::fromStdString(firstStr));
-    label1->setAlignment(Qt::AlignRight); // Align text to the right
+    label1->setAlignment(Qt::AlignRight);
     QFont font1 = label1->font();
-    font1.setPixelSize(15); // Set font size to 15 pixels
+    font1.setPixelSize(15);
     label1->setFont(font1);
     label1->setFixedHeight(20);
-    layout->insertWidget(0, label1);
+    scrollAreaLayout->insertWidget(0, label1);
 
     // Second QLabel
     QLabel* label2 = new QLabel(QString::fromStdString(secondStr));
@@ -207,7 +206,7 @@ void Calculator::addToHistory() {
     font2.setPixelSize(30);
     label2->setFont(font2);
     label2->setFixedHeight(40);
-    layout->insertWidget(1, label2);
+    scrollAreaLayout->insertWidget(1, label2);
 }
 
 void Calculator::convert() {

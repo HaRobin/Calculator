@@ -12,12 +12,14 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
@@ -94,10 +96,10 @@ public:
     QLabel *currentCalculation;
     QWidget *converterTabWidget;
     QGridLayout *gridLayout_7;
-    QComboBox *comboBox;
     QHBoxLayout *horizontalLayout;
     QLabel *inputConverter;
     QLabel *outputConverter;
+    QComboBox *comboBox;
     QGridLayout *gridLayout;
     QPushButton *pushButton_10;
     QPushButton *pushButton_11;
@@ -113,10 +115,13 @@ public:
     QPushButton *pushButton_6;
     QPushButton *pushButton_12;
     QPushButton *pushButton;
+    QFormLayout *formLayout;
     QWidget *historyTabWidget;
     QGridLayout *gridLayout_6;
     QScrollArea *scrollArea;
     QWidget *historyScrollAreaWidgetContents;
+    QVBoxLayout *verticalLayout_2;
+    QSpacerItem *verticalSpacer;
 
     void setupUi(QMainWindow *Calculator)
     {
@@ -587,11 +592,6 @@ public:
         converterTabWidget->setObjectName("converterTabWidget");
         gridLayout_7 = new QGridLayout(converterTabWidget);
         gridLayout_7->setObjectName("gridLayout_7");
-        comboBox = new QComboBox(converterTabWidget);
-        comboBox->setObjectName("comboBox");
-
-        gridLayout_7->addWidget(comboBox, 0, 0, 1, 1);
-
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
         inputConverter = new QLabel(converterTabWidget);
@@ -615,7 +615,12 @@ public:
         horizontalLayout->addWidget(outputConverter);
 
 
-        gridLayout_7->addLayout(horizontalLayout, 1, 0, 1, 1);
+        gridLayout_7->addLayout(horizontalLayout, 2, 0, 1, 1);
+
+        comboBox = new QComboBox(converterTabWidget);
+        comboBox->setObjectName("comboBox");
+
+        gridLayout_7->addWidget(comboBox, 0, 0, 1, 1);
 
         gridLayout = new QGridLayout();
         gridLayout->setObjectName("gridLayout");
@@ -734,7 +739,12 @@ public:
         gridLayout->addWidget(pushButton, 1, 0, 1, 1);
 
 
-        gridLayout_7->addLayout(gridLayout, 2, 0, 1, 1);
+        gridLayout_7->addLayout(gridLayout, 3, 0, 1, 1);
+
+        formLayout = new QFormLayout();
+        formLayout->setObjectName("formLayout");
+
+        gridLayout_7->addLayout(formLayout, 1, 0, 1, 1);
 
         tabWidget->addTab(converterTabWidget, QString());
         historyTabWidget = new QWidget();
@@ -746,7 +756,13 @@ public:
         scrollArea->setWidgetResizable(true);
         historyScrollAreaWidgetContents = new QWidget();
         historyScrollAreaWidgetContents->setObjectName("historyScrollAreaWidgetContents");
-        historyScrollAreaWidgetContents->setGeometry(QRect(0, 0, 358, 579));
+        historyScrollAreaWidgetContents->setGeometry(QRect(0, 0, 358, 577));
+        verticalLayout_2 = new QVBoxLayout(historyScrollAreaWidgetContents);
+        verticalLayout_2->setObjectName("verticalLayout_2");
+        verticalSpacer = new QSpacerItem(20, 556, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout_2->addItem(verticalSpacer);
+
         scrollArea->setWidget(historyScrollAreaWidgetContents);
 
         gridLayout_6->addWidget(scrollArea, 0, 0, 1, 1);
@@ -759,7 +775,7 @@ public:
 
         retranslateUi(Calculator);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(2);
         stackedWidget->setCurrentIndex(0);
 
 
