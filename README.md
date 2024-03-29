@@ -18,3 +18,11 @@ L'onglet convertisseur permet d'effectuer 3 conversions :
 L'onglet Historique permet de visualiser l'ensemble des calculs effectuer dans l'instance courante de la calculatrice.
 
 ## Exécution
+`cd muParser`
+`cmake .`
+`make`
+`sudo make install`
+`sudo ldconfig`
+`cd ../calculator`
+`qmake Calculator.pro`
+`make -j6 in `
