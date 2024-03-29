@@ -26,11 +26,13 @@ Les boutons des interfaces ont des raccourcis claviers associés à leur texte.
 
 ## Exécution
 - Assurez-vous d'avoir les commande cmake, make et qmake. Voici comment les installer :
+
   `sudo apt install qtbase5-dev`
 
   `sudo apt install cmake`
 
 - Installation de la bibliothèque externe muParser :
+  
   `cd muParser`
 
   `cmake .`
@@ -42,6 +44,7 @@ Les boutons des interfaces ont des raccourcis claviers associés à leur texte.
   `sudo ldconfig`
   
 - Compilation et exécution du projet :
+  
   `cd ../calculator`
 
   `qmake Calculator.pro`
