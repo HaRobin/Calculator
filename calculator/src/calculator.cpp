@@ -224,7 +224,6 @@ std::string Calculator::decimalToHexadecimal() {
     try {
         decimal = std::stoi(converterInput);
     } catch (const std::exception &e) {
-        qDebug() << e.what();
         return "error";
     }
 
