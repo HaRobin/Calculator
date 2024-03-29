@@ -19,7 +19,7 @@ Calculator::Calculator(QWidget *parent)
 
     digitsAndOperations = {
         {"lg", "log10("},
-        {"ln", "log"},
+        {"ln", "log("},
         {"%", "/100"},
         {"x^y", "^"},
         {"sqrt", "sqrt("},
@@ -139,16 +139,22 @@ void Calculator::calculate() {
 
     // TODO use muparser to parse string
 
-    // mu::Parser parser;
-    // parser.SetExpr(currentCalculation);
+    mu::Parser parser;
+    parser.SetExpr(currentCalculation);
     // parser.SetExpr(L"6*5");
 
     calculating = false;
 
 
     oldCalculation = currentCalculation;
-    // currentCalculation = parser.Eval();
-    currentCalculation = "evaluated";
+    try {
+        currentCalculation =  std::to_string(parser.Eval());
+    } catch (const mu::ParserError &e) {
+        currentCalculation = "error";
+    }
+
+
+    // currentCalculation = "evaluated";
 
 
 
@@ -174,9 +180,19 @@ void Calculator::addToHistory() {
         layout = new QVBoxLayout(ui->historyScrollAreaWidgetContents);
         ui->historyScrollAreaWidgetContents->setLayout(layout);
     }
+    std::string firstStr;
+    std::string secondStr;
+    if (ui->tabWidget->currentIndex() == 0) {
+        firstStr = oldCalculation + " =";
+        secondStr = currentCalculation;
+    }
+    else if (ui->tabWidget->currentIndex() == 1) {
+        firstStr = ui->comboBox->currentText().toStdString();
+        secondStr = converterInput + " -> " + converterOutput;
+    }
 
-    // First QLabel -> calculation
-    QLabel* label1 = new QLabel(QString::fromStdString(oldCalculation + " ="));
+    // First QLabel
+    QLabel* label1 = new QLabel(QString::fromStdString(firstStr));
     label1->setAlignment(Qt::AlignRight); // Align text to the right
     QFont font1 = label1->font();
     font1.setPixelSize(15); // Set font size to 15 pixels
@@ -184,8 +200,8 @@ void Calculator::addToHistory() {
     label1->setFixedHeight(20);
     layout->insertWidget(0, label1);
 
-    // Second QLabel -> result
-    QLabel* label2 = new QLabel(QString::fromStdString(currentCalculation));
+    // Second QLabel
+    QLabel* label2 = new QLabel(QString::fromStdString(secondStr));
     label2->setAlignment(Qt::AlignRight);
     QFont font2 = label2->font();
     font2.setPixelSize(30);
