@@ -27,19 +27,7 @@ RESOURCES += \
     resources/resources.qrc
 
 
-INCLUDEPATH += $$PWD/../muparser/include
-LIBS += -L$$PWD/../muparser/lib -lmuParser
+unix:!macx: LIBS += -L$$PWD/../muParser/ -lmuparser
 
-
-
-# unix:!macx: LIBS += -L$$PWD/../muparser-2.3.4/ -lmuparser
-
-# INCLUDEPATH += $$PWD/../muparser-2.3.4
-# DEPENDPATH += $$PWD/../muparser-2.3.4
-
-# win32:CONFIG(release, debug|release): LIBS += -L$$PWD/headers/muparser-2.3.4/release/ -lmuparser
-# else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/headers/muparser-2.3.4/debug/ -lmuparser
-# unix:!macx: LIBS += -L$$PWD/headers/muparser-2.3.4/ -lmuparser
-
-# INCLUDEPATH += $$PWD/headers/muparser-2.3.4
-# DEPENDPATH += $$PWD/headers/muparser-2.3.4
+INCLUDEPATH += $$PWD/../muParser
+DEPENDPATH += $$PWD/../muParser
